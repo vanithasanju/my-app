@@ -1,6 +1,6 @@
 node{
    stage('SCM Checkout'){
-     git 'https://github.com/damodaranj/my-app.git'
+     git 'https://github.com/vanithasanju/my-app.git'
    }
    stage('Compile-Package'){
 
@@ -14,19 +14,21 @@ node{
 	          sh "${mvnHome}/bin/mvn sonar:sonar"
 	        }
 	    }
-   stage('Build Docker Imager'){
-   sh 'docker build -t saidamo/myweb:0.0.2 .'
+    stage('Build Docker Imager'){
+   sh 'docker build -t vandock21/myweb:0.0.2 .'
    }
    stage('Docker Image Push'){
    withCredentials([string(credentialsId: 'dockerPass', variable: 'dockerPassword')]) {
-   sh "docker login -u saidamo -p ${dockerPassword}"
+   sh "docker login -u vandock21 -p ${dockerPassword}"
     }
-   sh 'docker push saidamo/myweb:0.0.2'
+   sh 'docker push vandock21/myweb:0.0.2'
    }
    stage('Nexus Image Push'){
-   sh "docker login -u admin -p admin123 65.2.123.80:8083"
-   sh "docker tag saidamo/myweb:0.0.2 65.2.123.80:8083/damo:1.0.0"
-   sh 'docker push 65.2.123.80:8083/damo:1.0.0'
+       withCredentials([string(credentialsId: 'admin', variable: 'nexusPassword')]) {
+   sh "docker login -u admin -p ${nexusPassword} 3.7.69.125:8083"
+   sh "docker tag vandock21/myweb:0.0.2 3.7.69.125:8083/nexusvan:1.0.0"
+   sh 'docker push 3.7.69.125:8083/nexusvan:1.0.0'
+   }
    }
    stage('Remove Previous Container'){
 	try{
@@ -38,4 +40,5 @@ node{
    sh 'docker run -d -p 8090:8080 --name tomcattest saidamo/myweb:0.0.2' 
    }
 }
+   
 }
